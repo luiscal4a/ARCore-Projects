@@ -12,9 +12,13 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.google.ar.core.Anchor;
@@ -42,24 +46,27 @@ public class MainActivity extends AppCompatActivity {
     private static final double MIN_OPENGL_VERSION = 3.0;
     private float x=0f, y=0f, z=0f;
     private ArFragment arFragment;
-    private ModelRenderable andyRenderable;
-    private ModelRenderable wheelchairRenderable;
     private AnchorNode myanchornode;
     TransformableNode mytranode = null;
 
     private SeekBar sb_size;
+    private Spinner spn_model;
 
     private HitResult myhit;
     private float mySize = 70f;
     private float mytravel=0.01f, distance_x=0f, distance_z=0f, myangle=0f;
 
-    private boolean stroller = true;
+
+    int[] sfb_source = {R.raw.wheelchair, R.raw.stroller, R.raw.cart};
+    String[] arr_models = {"Wheelchair", "Stroller", "Shopping cart"};
+    private ModelRenderable[] renderable_models = new ModelRenderable[sfb_source.length];
 
     @Override
     @SuppressWarnings({"AndroidApiChecker", "FutureReturnValueIgnored"})
     // CompletableFuture requires api level 24
     // FutureReturnValueIgnored is not valid
     protected void onCreate(Bundle savedInstanceState) {
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
 
         if (!checkIsSupportedDeviceOrFinish(this)) {
@@ -71,29 +78,18 @@ public class MainActivity extends AppCompatActivity {
         }
         catch (NullPointerException e){}
         setContentView(R.layout.activity_main);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         arFragment = (ArFragment) getSupportFragmentManager().findFragmentById(R.id.ux_fragment);
 
         Button r_left = (Button)findViewById(R.id.r_left);
         Button r_right = (Button)findViewById(R.id.r_right);
         Button accelerate = (Button)findViewById(R.id.accelerate);
-        Button select = (Button) findViewById(R.id.select);
+        spn_model = (Spinner) findViewById(R.id.spn_model);
         sb_size = (SeekBar) findViewById(R.id.sb_size);
         List<AnchorNode> anchorNodes = new ArrayList<>();
 
         sb_size.setEnabled(false);
 
-        select.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                stroller = !stroller;
-                if(mytranode!= null) {
-                    if (stroller)
-                        mytranode.setRenderable(andyRenderable);
-                    else
-                        mytranode.setRenderable(wheelchairRenderable);
-                }
-            }
-        });
 
 
         sb_size.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -159,37 +155,26 @@ public class MainActivity extends AppCompatActivity {
 
         });
 
-        // When you build a Renderable, Sceneform loads its resources in the background while returning
-        // a CompletableFuture. Call thenAccept(), handle(), or check isDone() before calling get().
-        ModelRenderable.builder()
-                .setSource(this, R.raw.stroller)
-                .build()
-                .thenAccept(renderable -> andyRenderable = renderable)
-                .exceptionally(
-                        throwable -> {
-                            Toast toast =
-                                    Toast.makeText(this, "Unable to load andy renderable", Toast.LENGTH_LONG);
-                            toast.setGravity(Gravity.CENTER, 0, 0);
-                            toast.show();
-                            return null;
-                        });
+        for(int i = 0 ; i < sfb_source.length ; i++) {
+            int finalI = i;
+            ModelRenderable.builder()
+                    .setSource(this, sfb_source[i])
+                    .build()
+                    .thenAccept(renderable -> renderable_models[finalI] = renderable)
+                    .exceptionally(
+                            throwable -> {
+                                Toast toast =
+                                        Toast.makeText(this, "Unable to load andy renderable", Toast.LENGTH_LONG);
+                                toast.setGravity(Gravity.CENTER, 0, 0);
+                                toast.show();
+                                return null;
+                            });
+        }
 
-        ModelRenderable.builder()
-                .setSource(this, R.raw.wheelchair)
-                .build()
-                .thenAccept(renderable -> wheelchairRenderable = renderable)
-                .exceptionally(
-                        throwable -> {
-                            Toast toast =
-                                    Toast.makeText(this, "Unable to load andy renderable", Toast.LENGTH_LONG);
-                            toast.setGravity(Gravity.CENTER, 0, 0);
-                            toast.show();
-                            return null;
-                        });
 
         arFragment.setOnTapArPlaneListener(
                 (HitResult hitResult, Plane plane, MotionEvent motionEvent) -> {
-                    if (andyRenderable == null || wheelchairRenderable == null) {
+                    if (renderable_models[spn_model.getSelectedItemPosition()] == null) {
                         return;
                     }
 
@@ -209,7 +194,6 @@ public class MainActivity extends AppCompatActivity {
                     anchorNodes.add(anchorNode);
                     sb_size.setEnabled(true);
 
-                    //myanchor = anchor;
                     myanchornode = anchorNode;
 
                     // Create the transformable andy and add it to the anchor.
@@ -219,17 +203,30 @@ public class MainActivity extends AppCompatActivity {
                     else andy = mytranode;
 
                     andy.setParent(anchorNode);
-                    if(stroller)
-                        andy.setRenderable(andyRenderable);
-                    else
-                        andy.setRenderable(wheelchairRenderable);
+                    andy.setRenderable(renderable_models[spn_model.getSelectedItemPosition()]);
                     andy.select();
-                    //andy.getScaleController().setEnabled(false);
 
                     mytranode = andy;
                     mytranode.setLocalRotation(new Quaternion(0f, 0f, 0f, 1f));
                     myanchornode.setLocalScale(new Vector3(mySize/70f, mySize/70f, mySize/70f));
                 });
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this,
+                android.R.layout.simple_spinner_dropdown_item,arr_models);
+
+        spn_model.setAdapter(adapter);
+        spn_model.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                if(mytranode != null)
+                    mytranode.setRenderable(renderable_models[i]);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+            }
+        });
+
     }
 
     void ascend(AnchorNode an, float x, float y, float z){
@@ -291,19 +288,7 @@ public class MainActivity extends AppCompatActivity {
             totalDistanceSquared += distance_vector[i]*distance_vector[i];
         return (float) Math.sqrt(totalDistanceSquared);
     }
-
-    /**
-     * Returns false and displays an error message if Sceneform can not run, true if Sceneform can run
-     * on this device.
-     *
-     * <p>Sceneform requires Android N on the device as well as OpenGL 3.0 capabilities.
-     *
-     * <p>Finishes the activity if Sceneform can not run
-     */
-
-
-
-
+    
     public static boolean checkIsSupportedDeviceOrFinish(final Activity activity) {
         if (Build.VERSION.SDK_INT < VERSION_CODES.N) {
             Log.e(TAG, "Sceneform requires Android N or later");

@@ -24,21 +24,20 @@
         android:enabled="false"
         android:progress="70"/>
 
-    <Button
-        android:id="@+id/select"
-        android:layout_width="wrap_content"
+
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:layout_centerHorizontal="true"
-        android:text="Select"
-        android:layout_alignParentTop="true"
-        android:background="@drawable/dr_button_green"
-        android:textSize="15dp"
-        android:padding="5dp"
-        android:textColor="#FFF"
-
-
-        />
+        android:layout_margin="20dp"
+        android:layout_marginHorizontal="10dp"
+        android:background="#FFFFFF">
+        <Spinner
+            style="@style/Widget.AppCompat.DropDownItem.Spinner"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:id="@+id/spn_model"
+            />
+    </RelativeLayout>
 
     <Button
         android:id="@+id/accelerate"

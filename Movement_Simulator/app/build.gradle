@@ -46,3 +46,9 @@ sceneform.asset('sampledata/stroller.fbx',
         'default',
         'sampledata/stroller.sfa',
         'src/main/assets/stroller')
+
+
+sceneform.asset('sampledata/cart.fbx',
+        'default',
+        'sampledata/cart.sfa',
+        'src/main/assets/cart')
