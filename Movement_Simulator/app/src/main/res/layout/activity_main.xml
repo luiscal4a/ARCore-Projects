@@ -47,7 +47,7 @@
         android:layout_marginRight="15dp"
         android:layout_marginBottom="20dp"
         android:layout_centerHorizontal="true"
-        android:text="Acelerar"
+        android:text="@string/str_accelerate"
         android:layout_alignParentBottom="true"
         android:background="@drawable/dr_button_green"
         android:textSize="15dp"
@@ -65,7 +65,7 @@
         android:layout_marginBottom="20dp"
         android:layout_alignParentBottom="true"
         android:layout_toLeftOf="@+id/accelerate"
-        android:text="Izquierda"
+        android:text="@string/str_left"
         android:background="@drawable/dr_button_white"
         android:textSize="15dp"
         android:textColor="@color/blue"
@@ -84,7 +84,7 @@
         android:textSize="15dp"
         android:padding="5dp"
 
-        android:text="Derecha"
+        android:text="@string/str_right"
 
         />
 </RelativeLayout>

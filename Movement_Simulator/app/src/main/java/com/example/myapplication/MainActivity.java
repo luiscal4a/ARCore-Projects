@@ -288,7 +288,7 @@ public class MainActivity extends AppCompatActivity {
             totalDistanceSquared += distance_vector[i]*distance_vector[i];
         return (float) Math.sqrt(totalDistanceSquared);
     }
-    
+
     public static boolean checkIsSupportedDeviceOrFinish(final Activity activity) {
         if (Build.VERSION.SDK_INT < VERSION_CODES.N) {
             Log.e(TAG, "Sceneform requires Android N or later");
