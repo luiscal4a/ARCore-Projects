@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.google.ar.sceneform.plugin'
 
 android {
     compileSdkVersion 29
@@ -17,6 +18,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    compileOptions {
+        sourceCompatibility = '1.8'
+        targetCompatibility = '1.8'
+    }
 }
 
 dependencies {
@@ -26,4 +31,23 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+
+    implementation "com.google.ar.sceneform.ux:sceneform-ux:1.10.0"
 }
+
+apply plugin: 'com.google.ar.sceneform.plugin'
+
+sceneform.asset('sampledata/cubito.fbx',
+        'default',
+        'sampledata/cubito.sfa',
+        'src/main/assets/cubito')
+
+sceneform.asset('sampledata/cubito2.fbx',
+        'default',
+        'sampledata/cubito2.sfa',
+        'src/main/assets/cubito2')
+
+sceneform.asset('sampledata/cubito3.fbx',
+        'default',
+        'sampledata/cubito3.sfa',
+        'src/main/assets/cubito3')

@@ -1,18 +1,94 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <fragment
+        android:id="@+id/ux_fragment"
+        android:name="com.google.ar.sceneform.ux.ArFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <ImageButton
+        android:id="@+id/btn_share"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_gravity="right"
+        android:layout_margin="10dp"
+        android:background="@drawable/ic_button_small_icon"
+        android:src="@drawable/ic_share_black_40dp"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="75dp"
+        android:background="@color/translucent_black">
+        <TextView
+            android:id="@+id/text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:textSize="30sp"
+            android:textColor="#fff"
+            android:text="Select width or height"
+            android:layout_marginVertical="10dp"/>
+    </LinearLayout>
+
+
+
+    <SeekBar
+        android:id="@+id/sk_height_control"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="100dp"
+        android:min="0"
+        android:max="500"
+        android:enabled="false"
+        android:progress="10"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom">
+
+        <Button
+            android:id="@+id/btn_width"
+            android:layout_width="150dp"
+            android:layout_height="75dp"
+            android:text="Width"
+            android:background="@drawable/ic_button_round_green"
+            android:textColor="@color/white"
+            android:layout_weight="1"
+            android:layout_margin="10dp"
+            android:textSize="20dp"/>
+
+        <Button
+            android:id="@+id/btn_save"
+            android:layout_width="150dp"
+            android:layout_height="75dp"
+            android:text="Save"
+            android:background="@drawable/ic_button_round_orange"
+            android:textColor="@color/white"
+            android:layout_weight="1"
+            android:layout_margin="10dp"
+            android:textSize="20dp"
+            />
+
+        <Button
+            android:id="@+id/btn_height"
+            android:layout_width="150dp"
+            android:layout_height="75dp"
+            android:text="Height"
+            android:background="@drawable/ic_button_round_green"
+            android:textColor="@color/white"
+            android:layout_weight="1"
+            android:layout_margin="10dp"
+            android:textSize="20dp"
+            />
+    </LinearLayout>
+
+</FrameLayout>
