@@ -32,9 +32,11 @@ import com.google.ar.core.Pose;
 import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.HitTestResult;
 import com.google.ar.sceneform.Node;
+import com.google.ar.sceneform.collision.CollisionShape;
 import com.google.ar.sceneform.math.Vector3;
 import com.google.ar.sceneform.rendering.MaterialFactory;
 import com.google.ar.sceneform.rendering.ModelRenderable;
+import com.google.ar.sceneform.rendering.Renderable;
 import com.google.ar.sceneform.rendering.ShapeFactory;
 import com.google.ar.sceneform.ux.ArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
@@ -72,9 +74,7 @@ public class MainActivity extends AppCompatActivity {
 
     List<AnchorNode> anchorNodes = new ArrayList<>();
 
-    private ArrayList<String> arl_saved = new ArrayList<String>();
-
-
+    private TransformableNode transformableNode;
 
 
     @Override
@@ -136,6 +136,7 @@ public class MainActivity extends AppCompatActivity {
 
         makeMaterial(objects[0], color);
 
+
         arFragment.setOnTapArPlaneListener(
                 (HitResult hitResult, Plane plane, MotionEvent motionEvent) -> {
                     if (ballRenderable == null) {
@@ -164,6 +165,14 @@ public class MainActivity extends AppCompatActivity {
                     andy.setRenderable(ballRenderable);
                     andy.select();
                     andy.getScaleController().setEnabled(false);
+                    andy.setOnTapListener(new Node.OnTapListener() {
+                        @Override
+                        public void onTap(HitTestResult hitTestResult, MotionEvent motionEvent) {
+                            transformableNode = andy;
+                            sk_height_control.setProgress(0);
+                        }
+                    });
+                    transformableNode = andy;
                 });
     }
 
@@ -173,10 +182,12 @@ public class MainActivity extends AppCompatActivity {
      * @param up distance in centimeters the object should be raised vertically
      */
     private void ascend(AnchorNode an, float up) {
-        Anchor anchor = myhit.getTrackable().createAnchor(
+        /*Anchor anchor = myhit.getTrackable().createAnchor(
                 myhit.getHitPose().compose(Pose.makeTranslation(0, up / 100f, 0)));
 
-        an.setAnchor(anchor);
+        an.setAnchor(anchor);*/
+        if(transformableNode != null)
+            transformableNode.setLocalPosition(new Vector3(0,up / 100f,0));
     }
 
     private void materialDialog(){
