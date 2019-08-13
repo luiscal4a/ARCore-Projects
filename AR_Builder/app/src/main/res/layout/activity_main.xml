@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
@@ -11,46 +12,87 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-
-
-    <SeekBar
-        android:id="@+id/sk_height_control"
-        android:layout_width="match_parent"
+    <LinearLayout
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:layout_marginBottom="100dp"
-        android:min="0"
-        android:max="500"
-        android:enabled="false"
-        android:progress="10"/>
+        android:orientation="vertical"
+        android:layout_gravity="right">
+        <ImageButton
+            android:id="@+id/btn_raise"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            android:layout_marginVertical="10dp"
+            android:src="@drawable/ic_arrow_upward"
+            android:background="@drawable/ic_button_small_icon"/>
+
+        <com.example.arbuilder.VerticalSeekBar
+            android:id="@+id/sk_height_control"
+            android:layout_width="wrap_content"
+            android:layout_marginHorizontal="25dp"
+            android:layout_height="400dp"
+            android:min="0"
+            android:max="500"
+            />
+    </LinearLayout>
+
+
+
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom">
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="20dp">
 
-        <Button
-            android:id="@+id/btn_new"
-            android:layout_width="150dp"
-            android:layout_height="75dp"
-            android:text="New object"
-            android:background="@drawable/ic_button_round_green"
-            android:textColor="@color/white"
-            android:layout_weight="1"
-            android:layout_margin="10dp"
-            android:textSize="20dp"/>
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2">
+            <ImageButton
+                android:id="@+id/btn_new"
+                android:layout_width="75dp"
+                android:layout_height="75dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_add"
+                android:scaleType="fitCenter"
+                android:padding="5dp"
+                android:background="@drawable/ic_button_icon_green"/>
+        </FrameLayout>
 
-        <Button
-            android:id="@+id/btn_clear"
-            android:layout_width="150dp"
-            android:layout_height="75dp"
-            android:text="Clear"
-            android:background="@drawable/ic_button_round_orange"
-            android:textColor="@color/white"
-            android:layout_weight="1"
-            android:layout_margin="10dp"
-            android:textSize="20dp"
-            />
+        <RelativeLayout
+            android:layout_width="120dp"
+            android:layout_height="120dp">
+            <ProgressBar
+                android:id="@+id/loading"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="invisible"/>
+            <ImageButton
+                android:id="@+id/take_photo"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/camera_button"
+                android:scaleType="fitCenter"
+                android:padding="5dp"
+                android:background="@null"/>
+        </RelativeLayout>
+
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2">
+            <ImageButton
+                android:id="@+id/btn_clear"
+                android:layout_width="75dp"
+                android:layout_height="75dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_delete"
+                android:scaleType="fitCenter"
+                android:padding="5dp"
+                android:background="@drawable/ic_button_icon_orange"/>
+        </FrameLayout>
     </LinearLayout>
 
 </FrameLayout>

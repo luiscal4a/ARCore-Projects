@@ -33,6 +33,7 @@ dependencies {
 
     implementation "com.google.ar.sceneform.ux:sceneform-ux:1.10.0"
     implementation "com.github.skydoves:colorpickerview:2.1.5"
+    implementation 'com.google.android.material:material:1.0.0'
 }
 
 apply plugin: 'com.google.ar.sceneform.plugin'
