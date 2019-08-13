@@ -36,3 +36,19 @@ dependencies {
 }
 
 apply plugin: 'com.google.ar.sceneform.plugin'
+
+
+sceneform.asset('sampledata/models/cone.fbx',
+        'default',
+        'sampledata/models/cone.sfa',
+        'src/main/assets/cone')
+
+sceneform.asset('sampledata/models/pyramid.fbx',
+        'default',
+        'sampledata/models/pyramid.sfa',
+        'src/main/assets/pyramid')
+
+sceneform.asset('sampledata/models/ring.fbx',
+        'default',
+        'sampledata/models/ring.sfa',
+        'src/main/assets/ring')

@@ -12,6 +12,7 @@ import android.os.Build;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
@@ -47,6 +48,7 @@ import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -58,9 +60,6 @@ public class MainActivity extends AppCompatActivity {
     private float upDistance = 0f;
     private ModelRenderable ballRenderable;
     private AnchorNode myanchornode;
-    private DecimalFormat form_numbers = new DecimalFormat("#0.00 m");
-
-    private HitResult myhit;
 
     private TextView text;
     private SeekBar sk_height_control;
@@ -69,8 +68,17 @@ public class MainActivity extends AppCompatActivity {
 
     private int color = android.graphics.Color.RED;
     float data1 = 0.25f, data2 = 0.25f, data3 = 0.25f;
+    float[] scale = {0.25f, 0.25f, 0.25f};
 
-    private String[] objects = {"Cube", "Sphere", "Cylinder"};
+    private String[] objects = {"Cube", "Sphere", "Cylinder", "Cone", "Pyramid", "Ring"};
+    private String[][] req_data = {{"Longitude", "Height", "Depth"}, {"Radius"},{"Radius", "Height"},
+            {"Radius", "Height"}, {"Side", "Height"}, {"Radius"}};
+
+    private boolean[] bool_scale = {false, false, false, true, true, true};
+    private float[] local_scale = {1f, 1f, 1f};
+
+    private int[] int_externalModels = {R.raw.cone, R.raw.pyramid, R.raw.ring};
+    private ModelRenderable[] rd_externalModels = new ModelRenderable[int_externalModels.length];
 
     List<AnchorNode> anchorNodes = new ArrayList<>();
 
@@ -134,7 +142,24 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        makeMaterial(objects[0], color);
+        for(int i = 0; i<int_externalModels.length ; i++) {
+            int finalI = i;
+            ModelRenderable.builder()
+                    .setSource(this, int_externalModels[finalI])
+                    .build()
+                    .thenAccept(renderable -> rd_externalModels[finalI] = renderable)
+                    .exceptionally(
+                            throwable -> {
+                                Toast toast =
+                                        Toast.makeText(this, "Unable to load andy renderable", Toast.LENGTH_LONG);
+                                toast.setGravity(Gravity.CENTER, 0, 0);
+                                toast.show();
+                                return null;
+                            });
+        }
+
+
+        makeMaterial(0, color);
 
 
         arFragment.setOnTapArPlaneListener(
@@ -142,7 +167,6 @@ public class MainActivity extends AppCompatActivity {
                     if (ballRenderable == null) {
                         return;
                     }
-                    myhit = hitResult;
 
                     // Create the Anchor.
                     Anchor anchor = hitResult.createAnchor();
@@ -164,6 +188,7 @@ public class MainActivity extends AppCompatActivity {
                     andy.setParent(anchorNode);
                     andy.setRenderable(ballRenderable);
                     andy.select();
+                    andy.setLocalScale(new Vector3(local_scale[0], local_scale[1], local_scale[2]));
                     andy.getScaleController().setEnabled(false);
                     andy.setOnTapListener(new Node.OnTapListener() {
                         @Override
@@ -247,17 +272,14 @@ public class MainActivity extends AppCompatActivity {
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(MainActivity.this);
         View mView = getLayoutInflater().inflate(R.layout.dialog_new_object, null);
 
-        EditText et_data1 = (EditText) mView.findViewById(R.id.et_data1);
-        EditText et_data2 = (EditText) mView.findViewById(R.id.et_data2);
-        EditText et_data3 = (EditText) mView.findViewById(R.id.et_data3);
+        EditText[] et_data = {mView.findViewById(R.id.et_data1), mView.findViewById(R.id.et_data2),
+                mView.findViewById(R.id.et_data3)};
 
-        TextView tv_data1 = (TextView) mView.findViewById(R.id.tv_data1);
-        TextView tv_data2 = (TextView) mView.findViewById(R.id.tv_data2);
-        TextView tv_data3 = (TextView) mView.findViewById(R.id.tv_data3);
+        TextView[] tv_data = {mView.findViewById(R.id.tv_data1), mView.findViewById(R.id.tv_data2),
+                mView.findViewById(R.id.tv_data3)};
 
-        LinearLayout ll_data1 = (LinearLayout) mView.findViewById(R.id.ll_data1);
-        LinearLayout ll_data2 = (LinearLayout) mView.findViewById(R.id.ll_data2);
-        LinearLayout ll_data3 = (LinearLayout) mView.findViewById(R.id.ll_data3);
+        LinearLayout[] ll_data = {mView.findViewById(R.id.ll_data1), mView.findViewById(R.id.ll_data2),
+                mView.findViewById(R.id.ll_data3)};
 
         btn_color = (Button) mView.findViewById(R.id.btn_color);
         Spinner spn_object = (Spinner) mView.findViewById(R.id.sp_object);
@@ -274,26 +296,13 @@ public class MainActivity extends AppCompatActivity {
         spn_object.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                if(i == 0){
-                    ll_data1.setVisibility(View.VISIBLE);
-                    ll_data2.setVisibility(View.VISIBLE);
-                    ll_data3.setVisibility(View.VISIBLE);
-                    tv_data1.setText("Longitude");
-                    tv_data2.setText("Height");
-                    tv_data3.setText("Depth");
-                }
-                else if(i == 1){
-                    ll_data1.setVisibility(View.VISIBLE);
-                    ll_data2.setVisibility(View.GONE);
-                    ll_data3.setVisibility(View.GONE);
-                    tv_data1.setText("Radius");
-                }
-                else if(i == 2){
-                    ll_data1.setVisibility(View.VISIBLE);
-                    ll_data2.setVisibility(View.VISIBLE);
-                    ll_data3.setVisibility(View.GONE);
-                    tv_data1.setText("Radius");
-                    tv_data2.setText("Height");
+                for(int j = 0; j<ll_data.length ; j++){
+                    if(j < req_data[i].length){
+                        ll_data[j].setVisibility(View.VISIBLE);
+                        tv_data[j].setText(req_data[i][j]);
+                    }
+                    else
+                        ll_data[j].setVisibility(View.GONE);
                 }
             }
 
@@ -313,40 +322,27 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 int position = spn_object.getSelectedItemPosition();
-                String str_data1 = et_data1.getText().toString();
-                String str_data2 = et_data2.getText().toString();
-                String str_data3 = et_data3.getText().toString();
-                switch (position){
-                    case 0:
-                        if(!str_data1.equals("")) {
-                            data1 = Float.parseFloat(str_data1);
-                            if (!str_data2.equals("")) {
-                                data2 = Float.parseFloat(str_data2);
-                                if (!str_data3.equals("")){
-                                    data3 = Float.parseFloat(str_data3);
-                                    makeMaterial("Cube", color);
-                                }
-                            }
-                        }
-                        break;
-
-                    case 1:
-                        if(!str_data1.equals("")) {
-                            data1 = Float.parseFloat(str_data1);
-                            makeMaterial("Sphere", color);
-                        }
-                        break;
-
-                    case 2:
-                        if(!str_data1.equals("")) {
-                            data1 = Float.parseFloat(str_data1);
-                            if(!str_data2.equals("")) {
-                                data2 = Float.parseFloat(str_data2);
-                                makeMaterial("Cylinder", color);
-                            }
-                        }
-                        break;
+                boolean bool_filled = true;
+                for(int j = 0; j < req_data[position].length ; j++){
+                    if(!isEmpty(et_data[j]))
+                        scale[j] = Float.parseFloat(et_data[j].getText().toString());
+                    else
+                        bool_filled = false;
                 }
+                if(bool_filled) {
+                    makeMaterial(position, color);
+                    if(bool_scale[position]) {
+                        Arrays.fill(local_scale, scale[0]);
+                        for (int j = 1; j < req_data[position].length; j++) {
+                            local_scale[j] = scale[j];
+                        }
+                    }
+                    else
+                        Arrays.fill(local_scale, 1f);
+                }
+                else
+                    Toast.makeText(MainActivity.this,
+                            "You did not fill all the required fields", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -354,6 +350,10 @@ public class MainActivity extends AppCompatActivity {
         AlertDialog dialog = mBuilder.create();
 
         dialog.show();
+    }
+
+    private boolean isEmpty(EditText et){
+        return et.getText().toString().equals("");
     }
 
     /**
@@ -374,19 +374,27 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void makeMaterial(String option, int mycolor){
+    private void makeMaterial(int option, int mycolor){
         MaterialFactory.makeTransparentWithColor(this, new Color(mycolor))
             .thenAccept(
                 material -> {
-                    if(option.equals(objects[0]))
+                    if(option == 0)
                         ballRenderable =
                                 ShapeFactory.makeCube(new Vector3(data1,data2,data3), new Vector3(0, 0, 0), material);
-                    else if(option.equals(objects[1]))
+                    else if(option == 1)
                         ballRenderable =
                                 ShapeFactory.makeSphere(data1, new Vector3(0, 0, 0), material);
-                    else
+                    else if(option == 2)
                         ballRenderable =
                                 ShapeFactory.makeCylinder(data1, data2, new Vector3(0, 0, 0), material);
+
+                    else {
+                        int index = option -3;
+                        if(index < rd_externalModels.length){
+                            ballRenderable = rd_externalModels[index].makeCopy();
+                            ballRenderable.setMaterial(material);
+                        }
+                    }
                 });
     }
 }
